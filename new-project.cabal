@@ -67,21 +67,25 @@ executable Haskell
     -- other-extensions:
 
     -- Other library packages from which modules are imported.
-    build-depends:    base ^>=4.17, ghc-prim, async, stm
+    build-depends:    base ^>=4.17, ghc-prim, async, mtl, text, stm
 
     -- Directories containing source files.
     hs-source-dirs:   app
 
     default-extensions:
         BlockArguments
+        FlexibleContexts
         GADTs
+        ImportQualifiedPost
         LambdaCase
         MonadComprehensions
         MultiWayIf
+        OverloadedStrings
         RankNTypes
         RecursiveDo
         StandaloneKindSignatures
         TypeApplications
+        TypeOperators
         TupleSections
 
     -- Base language which the package is written in.
