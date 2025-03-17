@@ -7,7 +7,7 @@ import Control.Concurrent.MVar (MVar ())
 import Control.Concurrent.MVar qualified as MVar (newEmptyMVar, putMVar, readMVar)
 import Control.Monad (forever)
 import Control.Monad.IO.Class (MonadIO (..))
-import Control.Monad.Reader (MonadReader (..), ReaderT (..), runReaderT)
+import Control.Monad.Reader (MonadReader (..), ReaderT (..))
 import Text.Printf qualified as IO (printf)
 import Data.Kind (Type)
 import Data.String ()
@@ -18,22 +18,22 @@ newEmptyMVar :: forall a {m} . MonadIO m => m (MVar a)
 newEmptyMVar = liftIO $ MVar.newEmptyMVar
 
 putMVar :: MonadIO m => MVar a -> a -> m ()
-putMVar m v = liftIO $ MVar.putMVar m v
+putMVar m = liftIO . MVar.putMVar m
 
 readMVar :: MonadIO m => MVar a -> m a
-readMVar p = liftIO $ MVar.readMVar p
+readMVar = liftIO . MVar.readMVar
 
 getLine :: MonadIO m => m Text
 getLine = liftIO $ IO.getLine
 
 putStr :: MonadIO m => Text -> m ()
-putStr v = liftIO $ IO.putStr v
+putStr = liftIO . IO.putStr
 
 putStrLn :: MonadIO m => Text -> m ()
-putStrLn v = liftIO $ IO.putStrLn v
+putStrLn = liftIO . IO.putStrLn
 
 said :: MonadIO m => Text -> m ()
-said v = liftIO $ IO.printf "You said: %s!\n" v
+said = liftIO . IO.printf "You said: %s!\n"
 
 type Incoming :: Type -> Type
 data Incoming s where
@@ -77,5 +77,5 @@ halt = do
 main :: IO ()
 main = do
   c <- newEmptyMVar @()
-  w <- async . (`runReaderT` c) $ repl
+  w <- async $ runReaderT repl c
   readMVar c >> cancel w >> waitCatch w >> putStrLn "Goodbye!"
