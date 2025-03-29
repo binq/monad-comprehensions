@@ -43,7 +43,6 @@ data Incoming s where
 type Outgoing :: Type -> Type
 data Outgoing s where
   Report :: s -> Outgoing s
-  Pass :: Outgoing s
 
 repl :: (c ~ MVar (), MonadReader c m, MonadIO m) => m ()
 repl = forever [() | _ <- read >>= evaluate >>= print]
@@ -58,21 +57,20 @@ read = do
 evaluate :: (c ~ MVar (), MonadReader c m, MonadIO m) => Incoming Text -> m (Outgoing Text)
 evaluate =
   \case
-    Terminate -> halt >> pure Pass
+    Terminate -> halt
     Got v -> pure $ Report v
 
 print :: MonadIO m => Outgoing Text -> m ()
-print = 
+print =
   \case
-    Pass -> pure ()
     Report v -> said v
 
-halt :: (c ~ MVar (), MonadReader c m, MonadIO m) => m ()
+halt :: (c ~ MVar (), MonadReader c m, MonadIO m) => m e
 halt = do
   c <- ask
   putMVar c ()
   _ <- newEmptyMVar >>= readMVar
-  pure ()
+  error "this will never be reached"
 
 main :: IO ()
 main = do
